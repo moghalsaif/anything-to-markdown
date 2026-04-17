@@ -187,15 +187,6 @@ export function ConverterShell() {
       <header className="mb-8">
         {/* Attribution strip */}
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          {/* Mobile-safe badge */}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="5" y="2" width="14" height="20" rx="2" />
-              <line x1="12" y1="18" x2="12.01" y2="18" />
-            </svg>
-            Mobile safe
-          </span>
-
           {/* Built with MarkItDown */}
           <a
             href="https://github.com/microsoft/markitdown"
