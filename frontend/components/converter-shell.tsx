@@ -33,13 +33,7 @@ const DEFAULT_MARKDOWN = "# Ready\n\nConvert a file or URL to see Markdown here.
 
 function MicrosoftLogo({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 21 21"
-      className={className}
-      aria-hidden="true"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox="0 0 21 21" className={className} aria-hidden="true" fill="none">
       <rect x="1" y="1" width="9" height="9" fill="#F25022" />
       <rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
       <rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
@@ -116,8 +110,7 @@ export function ConverterShell() {
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    const dropped = e.dataTransfer.files[0] ?? null;
-    handleFileSelect(dropped);
+    handleFileSelect(e.dataTransfer.files[0] ?? null);
   };
 
   const onFileSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -127,14 +120,12 @@ export function ConverterShell() {
       setStatus("Choose a file first.");
       return;
     }
-
     const formData = new FormData();
     formData.append("file", file);
-
     try {
       setIsFileLoading(true);
       setError("");
-      setStatus(`Uploading ${file.name}...`);
+      setStatus(`Uploading ${file.name}…`);
       const response = await api.post<ConversionResponse>("/convert/file", formData);
       applyResult(response.data);
     } catch (err) {
@@ -153,11 +144,10 @@ export function ConverterShell() {
       setStatus("Paste a URL first.");
       return;
     }
-
     try {
       setIsUrlLoading(true);
       setError("");
-      setStatus("Fetching webpage...");
+      setStatus("Fetching webpage…");
       const response = await api.post<ConversionResponse>("/convert/url", { url: url.trim() });
       applyResult(response.data);
     } catch (err) {
@@ -192,31 +182,70 @@ export function ConverterShell() {
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 flex flex-col">
-      {/* Header */}
-      <header className="mb-8 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
-            MarkItDown
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Convert files and URLs to clean Markdown instantly.
-          </p>
+
+      {/* ── Top bar ─────────────────────────────────────────── */}
+      <header className="mb-8">
+        {/* Attribution strip */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          {/* Mobile-safe badge */}
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="12" y1="18" x2="12.01" y2="18" />
+            </svg>
+            Mobile safe
+          </span>
+
+          {/* Built with MarkItDown */}
+          <a
+            href="https://github.com/microsoft/markitdown"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-300"
+          >
+            <MicrosoftLogo className="h-3 w-3" />
+            Built with MarkItDown
+          </a>
+
+          {/* GitHub */}
+          <a
+            href="https://github.com/moghalsaif"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-300"
+          >
+            <Github className="h-3 w-3" />
+            moghalsaif
+          </a>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        >
-          {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-          {theme === "light" ? "Dark" : "Light"}
-        </Button>
+
+        {/* Title row */}
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+              MarkItDown
+            </h1>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Convert files and URLs to clean Markdown instantly.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          >
+            {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            {theme === "light" ? "Dark" : "Light"}
+          </Button>
+        </div>
       </header>
 
-      {/* Main grid */}
+      {/* ── Main grid ───────────────────────────────────────── */}
       <main className="flex-1 grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
+        {/* Left column */}
         <div className="space-y-6">
-          {/* File Upload Card */}
+          {/* File Upload */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>File Upload</CardTitle>
@@ -224,7 +253,6 @@ export function ConverterShell() {
             </CardHeader>
             <CardContent>
               <form className="space-y-4" onSubmit={onFileSubmit}>
-                {/* Hidden native input */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -232,8 +260,6 @@ export function ConverterShell() {
                   className="hidden"
                   onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
                 />
-
-                {/* Drop zone */}
                 <div
                   role="button"
                   tabIndex={0}
@@ -261,7 +287,7 @@ export function ConverterShell() {
                         <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
                           {file.name}
                         </p>
-                        <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                        <p className="text-xs text-zinc-400">
                           {(file.size / 1024).toFixed(0)} KB
                         </p>
                       </div>
@@ -287,23 +313,22 @@ export function ConverterShell() {
                         <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                           {isDragging ? "Drop it here" : "Click or drag a file"}
                         </p>
-                        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+                        <p className="mt-0.5 text-xs text-zinc-400">
                           PDF · Word · Excel · PPT · HTML · CSV · TXT
                         </p>
                       </div>
                     </>
                   )}
                 </div>
-
                 <Button type="submit" className="w-full" disabled={isFileLoading}>
-                  {isFileLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
+                  {isFileLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
                   Convert file
                 </Button>
               </form>
             </CardContent>
           </Card>
 
-          {/* URL Conversion Card */}
+          {/* URL Conversion */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>URL Conversion</CardTitle>
@@ -317,14 +342,14 @@ export function ConverterShell() {
                   placeholder="https://example.com/article"
                 />
                 <Button type="submit" className="w-full" disabled={isUrlLoading}>
-                  {isUrlLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
+                  {isUrlLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
                   Convert URL
                 </Button>
               </form>
             </CardContent>
           </Card>
 
-          {/* Status Card */}
+          {/* Status */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>Status</CardTitle>
@@ -344,12 +369,12 @@ export function ConverterShell() {
           </Card>
         </div>
 
-        {/* Result Card */}
+        {/* Right column — single preview panel */}
         <Card className="flex flex-col">
           <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
             <div>
-              <CardTitle>Result</CardTitle>
-              <CardDescription className="mt-0.5 text-xs font-mono text-zinc-400 dark:text-zinc-500">
+              <CardTitle>Preview</CardTitle>
+              <CardDescription className="mt-0.5 font-mono text-xs text-zinc-400 dark:text-zinc-500">
                 {filename}
               </CardDescription>
             </div>
@@ -390,66 +415,12 @@ export function ConverterShell() {
             </div>
           </CardHeader>
           <CardContent className="flex-1">
-            <div className="grid gap-4 h-full xl:grid-cols-2">
-              <div className="min-h-[360px] rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                  Preview
-                </div>
-                <MarkdownPanel markdown={markdown} />
-              </div>
-              <div className="min-h-[360px] rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                  Markdown
-                </div>
-                <pre className="overflow-x-auto whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-                  <code>{markdown}</code>
-                </pre>
-              </div>
+            <div className="min-h-[480px] rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <MarkdownPanel markdown={markdown} />
             </div>
           </CardContent>
         </Card>
       </main>
-
-      {/* Footer */}
-      <footer className="mt-12 border-t border-zinc-200 pt-6 pb-2 dark:border-zinc-800">
-        <div className="flex flex-col items-center justify-between gap-3 text-xs text-zinc-400 dark:text-zinc-500 sm:flex-row">
-          {/* Left: mobile-safe badge */}
-          <div className="flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="5" y="2" width="14" height="20" rx="2" />
-                <line x1="12" y1="18" x2="12.01" y2="18" />
-              </svg>
-              Mobile safe
-            </span>
-          </div>
-
-          {/* Right: attribution */}
-          <div className="flex items-center gap-4">
-            <a
-              href="https://github.com/microsoft/markitdown"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
-            >
-              <MicrosoftLogo className="h-3.5 w-3.5" />
-              Built with MarkItDown
-            </a>
-
-            <span className="text-zinc-300 dark:text-zinc-700">·</span>
-
-            <a
-              href="https://github.com/moghalsaif"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
-            >
-              <Github className="h-3.5 w-3.5" />
-              moghalsaif
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
