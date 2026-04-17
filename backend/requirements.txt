@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+markitdown[all]
+python-multipart
+requests
+beautifulsoup4
+readability-lxml
+pydantic
+python-dotenv
+aiofiles
